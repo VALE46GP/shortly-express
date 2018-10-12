@@ -44,6 +44,10 @@ class Users extends Model {
 
     return super.create.call(this, newUser);
   }
+
+  checkIfUserExists(username) {
+    return super.get.call(this, {username});
+  }
 }
 
 module.exports = new Users();
