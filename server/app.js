@@ -5,6 +5,7 @@ const partials = require('express-partials');
 const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
+const cookieParser = require('./middleware/cookieParser.js');
 
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-
+// mounting middleware
+// app.use()
 
 app.get('/', 
   (req, res) => {
@@ -62,6 +64,7 @@ app.post('/signup',
         res.status(201).send();
       })
       .error(error => {
+        res.redirect('/signup');
         res.status(401).send(error);
       });
   });
@@ -71,20 +74,19 @@ app.post('/login',
     var url = req.body.url;
     return models.Users.checkIfUserExists(req.body.username)
       .then((data) => {
-        // if username does NOT exist
         if (!data) {
           throw ('username does NOT exist');
         }
-        // if password is incorrect
         if (!models.Users.compare(req.body.password, data.password, data.salt)) {
           throw ('password incorrect');
         }
         console.log('authentic');
-        res.redirect('/index');
+        res.redirect('/');
         res.status(201).end();
       })
       .catch((error) => {
         console.log(error);
+        res.redirect('/login');
         res.status(401).end();
       });
   });
